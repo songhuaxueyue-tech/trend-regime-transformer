@@ -1,15 +1,14 @@
-# ===== Project output files =====
-
-_sanity_output/
-data/
-data_out/
-test/
-validation/
-end
-other
-
 # ===== Python cache =====
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
+# ===== Data / outputs =====
+data/
+data_out/
+_sanity_output/
 
+# ===== Temporary / misc =====
+end
+other
