@@ -5,9 +5,9 @@ __pycache__/
 *.pyd
 
 # ===== Data / outputs =====
-data/
 data_out/
 _sanity_output/
+checkpoints/
 
 # ===== Temporary / misc =====
 end
