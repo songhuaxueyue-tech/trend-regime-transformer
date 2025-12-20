@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from scripts.model import RegimeTransformer
+from scripts.model.model import RegimeTransformer
 
 
 def main():

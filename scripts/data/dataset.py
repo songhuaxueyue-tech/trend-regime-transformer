@@ -87,7 +87,20 @@ class OHLCVWindowDataset(Dataset):
         window_df = self.df.iloc[start_idx:end_idx + 1]
 
         X = window_df[self.feature_cols].values.astype(np.float32)
-        y = int(window_df[self.label_col].iloc[-1])
+        # y = int(window_df[self.label_col].iloc[-1])
+
+        raw_label = int(window_df[self.label_col].iloc[-1])
+
+
+        # Re-map original labels {Up=1, Down=2} -> binary labels {Up=0, Down=1}
+        if raw_label == 1:      # Up
+            y = 0
+        elif raw_label == 2:    # Down
+            y = 1
+        else:
+            raise ValueError("Sideway label should not appear when drop_sideway=True")
+
+                
 
         # per-window normalization (important!)
         if self.normalize:
@@ -97,5 +110,7 @@ class OHLCVWindowDataset(Dataset):
 
         X = torch.from_numpy(X)
         y = torch.tensor(y, dtype=torch.long)
+
+
 
         return X, y

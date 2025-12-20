@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from dataset import OHLCVWindowDataset
+from scripts.data.dataset import OHLCVWindowDataset
 
 import matplotlib
 
@@ -14,7 +14,7 @@ print("[DEBUG] CWD =", os.getcwd())
 
 
 # ================= 配置 =================
-DATA_PATH = "../data_out/BTC_USDT_USDT-1h-futures.feather"
+DATA_PATH = "other\data_out\BTC_USDT_USDT-1h-futures.feather"
 WINDOW = 48
 N_SAMPLES = 20          # 抽样窗口数量（建议 3–10）
 SHOW_VOLUME = False   # 是否显示 volume

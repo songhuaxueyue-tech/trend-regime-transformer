@@ -206,8 +206,9 @@ def main():
 
     if slope_threshold is None and slope_quantile is None:
         # recommend using quantile 0.90 if not provided
-        rec = recommend_slope_threshold(df, window=args.window, q=0.90, use_log=use_log)
-        print(f"[INFO] No threshold provided. Recommended rel_slope threshold by 90% quantile: {rec:.6e}")
+        q = 0.90     #指定分位数
+        rec = recommend_slope_threshold(df, window=args.window, q=q, use_log=use_log)
+        print(f"[INFO] No threshold provided. Recommended rel_slope threshold by {q * 100}% quantile: {rec:.6e}")
         slope_threshold = rec
 
     volatility_filter = None

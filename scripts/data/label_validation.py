@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # ========== 配置 ==========
-DATA_PATH = "../data_out/BTC_USDT_USDT-1h-futures.feather"   # 改成你的添加标签路径路径
+DATA_PATH = "other\data_out\BTC_USDT_USDT-1h-futures_labeled_q70.feather"   # 改成你的添加标签路径路径
 WINDOW = 48
 N_SAMPLES = 20
 # ==========================

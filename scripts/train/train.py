@@ -5,8 +5,11 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import os
 
-from scripts.dataset import OHLCVWindowDataset
-from scripts.model import RegimeTransformer
+from scripts.data.dataset_future import FutureRegimeDataset
+from scripts.model.model import RegimeTransformer
+
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 def train_one_epoch(model, loader, criterion, optimizer, device):
@@ -64,24 +67,24 @@ def main():
     lr = 1e-3
     epochs = 20
     window = 48
-    num_classes = 3
+    num_classes = 2
 
     # ===== 数据路径（你真实的数据）=====
-    train_path = "other/data_split/train.feather"           # 包含 date, open, high, low, close, volume, label 列前70% 的数据文件
-    val_path = "other/data_split/val.feather"               # 包含 date, open, high, low, close, volume, label 列后30% 的数据文件
+    train_path = r"other\data_split\train.feather"           # 包含 date, open, high, low, close, volume, label 列前70% 的数据文件
+    val_path = r"other\data_split\val.feather"               # 包含 date, open, high, low, close, volume, label 列后30% 的数据文件
 
-    train_dataset = OHLCVWindowDataset(
+    train_dataset = FutureRegimeDataset(
         data_path=train_path,
-        window=window,
+        past_window=window,
+        future_window=window,
         normalize=True,
-        drop_sideway=False,
     )
 
-    val_dataset = OHLCVWindowDataset(
+    val_dataset = FutureRegimeDataset(
         data_path=val_path,
-        window=window,
+        past_window=window,
+        future_window=window,
         normalize=True,
-        drop_sideway=False,
     )
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False)

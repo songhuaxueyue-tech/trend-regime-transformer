@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
-from scripts.dataset import OHLCVWindowDataset
+from scripts.data.dataset import OHLCVWindowDataset
 
 DATA_PATH = "../data_out/BTC_USDT_USDT-1h-futures.feather"
 
