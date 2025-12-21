@@ -21,11 +21,13 @@ class FutureRegimeDataset(Dataset):
         feature_cols: Optional[List[str]] = None,
         label_col: str = "regime",
         normalize: bool = True,
+        return_meta: bool = False,
     ):
         self.past_window = past_window
         self.future_window = future_window
         self.normalize = normalize
         self.label_col = label_col
+        self.return_meta = return_meta
 
         # -------- load data --------
         if data_path.endswith(".feather") or data_path.endswith(".parquet"):
@@ -37,26 +39,39 @@ class FutureRegimeDataset(Dataset):
             df["date"] = pd.to_datetime(df["date"])
             df = df.set_index("date")
 
+        # 排序
         df = df.sort_index()
+
+        # 统一列名（非常关键）
         df = df.rename(columns={c: c.lower() for c in df.columns})
 
+
+                # ===== feature columns =====
         if feature_cols is None:
             feature_cols = ["open", "high", "low", "close", "volume"]
 
-        for c in feature_cols + [label_col]:
-            if c not in df.columns:
-                raise ValueError(f"missing column: {c}")
+        self.feature_cols = feature_cols
+
+
+        # 检查 future_rel_slope 是否存在
+        if "future_rel_slope" not in df.columns:
+            raise ValueError(
+                "future_rel_slope not found. "
+                "Please run label_generator to generate future labels first."
+            )
 
         self.df = df
+
         self.feature_cols = feature_cols
 
         # -------- build valid indices --------
         self.indices = []
 
-        for t in range(
-            past_window - 1,
-            len(df) - future_window
-        ):
+        start = past_window - 1
+        end = len(df) - future_window - 1
+
+        for t in range(start, end + 1):
+
             future_label = int(df.iloc[t + future_window][label_col])
 
             if future_label == 0:      # Sideway → ignore
@@ -85,6 +100,7 @@ class FutureRegimeDataset(Dataset):
         # ----- label: future regime -----
         raw_label = int(self.df.iloc[t + self.future_window][self.label_col])
 
+
         if raw_label == 1:      # Up
             y = 0
         elif raw_label == 2:    # Down
@@ -92,4 +108,14 @@ class FutureRegimeDataset(Dataset):
         else:
             raise RuntimeError("Sideway should not appear here")
 
-        return torch.from_numpy(X), torch.tensor(y, dtype=torch.long)
+        meta = {
+            "future_rel_slope": self.df.iloc[t + self.future_window]["future_rel_slope"]
+        }
+
+
+        if self.return_meta:
+            return X, y, meta
+        else:
+            return X, y
+
+
