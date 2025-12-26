@@ -5,8 +5,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import os
 
-from scripts.data.dataset_future import FutureRegimeDataset
-from scripts.model.model import RegimeTransformer
+from research.data.dataset_future import FutureRegimeDataset
+from research.model.model import RegimeTransformer
 
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -70,8 +70,8 @@ def main():
     num_classes = 2
 
     # ===== 数据路径（你真实的数据）=====
-    train_path = r"other\data_split\train.feather"           # 包含 date, open, high, low, close, volume, label 列前70% 的数据文件
-    val_path = r"other\data_split\val.feather"               # 包含 date, open, high, low, close, volume, label 列后30% 的数据文件
+    train_path = r"data\split\train.feather"           # 包含 date, open, high, low, close, volume, label 列前70% 的数据文件
+    val_path = r"data\split\val.feather"               # 包含 date, open, high, low, close, volume, label 列后30% 的数据文件
 
     train_dataset = FutureRegimeDataset(
         data_path=train_path,
@@ -121,7 +121,7 @@ def main():
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
-            torch.save(model.state_dict(), "checkpoints/best_model.pt")
+            torch.save(model.state_dict(), "research/checkpoints/best_model.pt")
 
     print("Training finished.")
 

@@ -3,12 +3,21 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+test.py
 
 # ===== Data / outputs =====
 data_out/
 _sanity_output/
-checkpoints/
+research/checkpoints/*
+data/labeled/*
+data/raw/*
+data/split/*
 
 # ===== Temporary / misc =====
 end
-other
+_other
+
+
+
+
+

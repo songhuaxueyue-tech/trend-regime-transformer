@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 from torch.utils.data import DataLoader
 
-from scripts.data.dataset_future import FutureRegimeDataset
-from scripts.model.model import RegimeTransformer
+from research.data.dataset_future import FutureRegimeDataset
+from research.model.model import RegimeTransformer
 
 
 @torch.no_grad()
@@ -38,8 +38,8 @@ def main():
     batch_size = 128
     num_classes = 2
 
-    val_path = "other/data_split/val.feather"
-    ckpt_path = "checkpoints/best_model.pt"
+    val_path = "data/split/val.feather"
+    ckpt_path = "research/checkpoints/best_model.pt"
 
     # ===== Dataset（Day 8 用：必须保留 future_rel_slope）=====
     val_dataset = FutureRegimeDataset(

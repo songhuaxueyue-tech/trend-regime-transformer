@@ -3,7 +3,7 @@
 import torch
 import torch.nn as nn
 
-from scripts.model.embedding import FeatureEmbedding, PositionalEncoding
+from research.model.embedding import FeatureEmbedding, PositionalEncoding
 
 
 class RegimeTransformer(nn.Module):
