@@ -1,0 +1,34 @@
+
+  cs_mom:
+    # ❌ 删除或注释掉这行
+    # image: freqtradeorg/freqtrade:develop_freqai
+    
+    # ✅ 新增构建配置
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    restart: unless-stopped
+    container_name: freqtrade_cs_mom
+
+    # ... (后续 volumes, ports 等保持不变) ...
+    volumes:
+      - "./cs_mom/user_data:/freqtrade/user_data"
+      - "./class/user_data/data:/freqtrade/user_data/data"
+
+      # 2. ⚠️ 新增挂载：左边是宿主机AI项目路径，右边是容器内路径
+      # 请确保左边的路径是正确的绝对路径或相对路径
+      - "~/project/trend-regime-transformer:/freqtrade/user_data/ai_logic"
+
+    # Expose api on port 8080 (localhost only)
+    # Please read the https://www.freqtrade.io/en/stable/rest-api/ documentation
+    # for more information.
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    # 代理配置
+    network_mode: host
+
+    # Default command used when running `docker compose up`
+    command: >
+      webserver

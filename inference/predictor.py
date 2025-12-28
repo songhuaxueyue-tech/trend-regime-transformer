@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 import os
 from research.model.model import RegimeTransformer
-
+from pathlib import Path 
+import time
 
 class RegimePredictor:
     """
@@ -19,16 +20,27 @@ class RegimePredictor:
         else:
             self.device = device
             
-        # 2. 默认模型路径 (相对路径，基于根目录执行的假设)
+            
+        # 2. 智能锁定模型路径 (Path-based)
         if model_path is None:
-            # 假设用户在根目录运行，直接指向 research/checkpoints
-            model_path = "research/checkpoints/best_model.pt"
+            # 方案：以当前脚本 (predictor.py) 为锚点
+            # 当前位置: .../inference/predictor.py
+            current_dir = Path(__file__).resolve().parent
+            # 项目根目录: .../inference/../ (即 ai_logic 目录)
+            project_root = current_dir.parent
+            # 拼接绝对路径: .../ai_logic/research/checkpoints/best_model.pt
+            model_path_obj = project_root / "research" / "checkpoints" / "best_model.pt"
+            
+            model_path = str(model_path_obj) # 转为字符串以防万一
             
         if not os.path.exists(model_path):
-            raise FileNotFoundError(f"模型文件未找到: {model_path} (请确保在项目根目录运行)")
+            # 打印调试信息，让你知道它到底去哪找了
+            print(f"[Debug] 尝试加载路径: {model_path}")
+            raise FileNotFoundError(f"模型文件未找到: {model_path}")
 
         print(f"[INFO] Loading model from {model_path} on {self.device}...")
-        
+
+
         # 3. 初始化模型
         self.model = RegimeTransformer(
             feature_dim=5, 
@@ -68,10 +80,43 @@ class RegimePredictor:
         x_tensor = torch.from_numpy(x_norm).float().unsqueeze(0).to(self.device)
         return x_tensor
 
+
     def predict(self, df: pd.DataFrame):
+        """
+        执行推理，并打印分段延迟数据
+        """
+        # [Timer 1] 开始计时
+        t0 = time.perf_counter()
+        
+        # 1. 预处理
         x = self.preprocess(df)
+        
+        # [Timer 2] 预处理结束
+        t1 = time.perf_counter()
+        
         if x is None: return -1
+        
         with torch.no_grad():
+            # 2. 模型推理
             logits = self.model(x)
+            
+            # --- [专业细节] ---
+            # 如果是 GPU 运行，强制等待计算完成再停止计时
+            # 这能证明你懂 CPU-GPU 的异构协作机制
+            if self.device.type == 'cuda':
+                torch.cuda.synchronize()
+            
             pred = logits.argmax(dim=1).item()
+            
+        # [Timer 3] 全部结束
+        t2 = time.perf_counter()
+        
+        # 计算毫秒数
+        prep_latency = (t1 - t0) * 1000  
+        infer_latency = (t2 - t1) * 1000 
+        total_latency = prep_latency + infer_latency
+        
+        # 打印日志
+        print(f"[Profiling] Total: {total_latency:.2f}ms | Prep: {prep_latency:.2f}ms | Infer: {infer_latency:.2f}ms")
+            
         return pred

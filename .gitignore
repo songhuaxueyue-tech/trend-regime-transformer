@@ -12,6 +12,7 @@ research/checkpoints/*
 data/labeled/*
 data/raw/*
 data/split/*
+data
 
 # ===== Temporary / misc =====
 end
